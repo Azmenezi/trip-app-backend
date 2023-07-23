@@ -5,7 +5,7 @@ const morgan = require("morgan");
 const app = express();
 const notFound = require("./middlewares/notFoundHandler");
 const errorHandler = require("./middlewares/errorHandler");
-const tempRoutes = require("./api/temp/temp.routes");
+const userRoutes = require("./api/user/routes");
 const config = require("./config/keys");
 const passport = require("passport");
 const { localStrategy, jwtStrategy } = require("./middlewares/passport");
@@ -19,8 +19,8 @@ app.use(passport.initialize());
 passport.use("local", localStrategy);
 passport.use(jwtStrategy);
 
-// Everything with the word temp is a placeholder that you'll change in accordance with your project
-app.use("/temp", tempRoutes);
+// Everything with the word user is a placeholder that you'll change in accordance with your project
+app.use("/user", userRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
