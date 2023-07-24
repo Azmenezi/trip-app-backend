@@ -1,4 +1,5 @@
 const Trip = require("../../models/Trip");
+const User = require("../../models/User");
 
 exports.fetchTrip = async (tripId, next) => {
   try {
@@ -6,6 +7,44 @@ exports.fetchTrip = async (tripId, next) => {
     return trip;
   } catch (error) {
     return next({ status: 400, message: error.message });
+  }
+};
+
+exports.addTrip = async (req, res, next) => {
+  try {
+    if (!req.user) {
+      res.status(401).json({
+        message: "Only members are authorized to add a trip",
+      });
+    }
+
+    if (req.file) {
+      req.body.image = `${req.file.path.replace("\\", "/")}`;
+    }
+
+    const { title } = req.body;
+    if (title == "") {
+      return res.status(403).json({ message: "Field can't be empty" });
+    }
+
+    const existingTrip = await Trip.findOne({ title });
+    if (existingTrip) {
+      return res.status(400).json({ message: "Trip already exists" });
+    }
+
+    const trip = await Trip.create({
+      title: req.body.name,
+      description: req.body.ingredients,
+      image: req.body.image,
+      creator: req.user._id,
+    });
+
+    req.user.trips = [...req.user.trips, trip._id];
+
+    await user.save();
+    return res.status(201).json(trip);
+  } catch (err) {
+    next(err);
   }
 };
 

@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 
-const { fetchTrip, deleteTrip } = require("./controllers");
+const { fetchTrip, deleteTrip, addTrip } = require("./controllers");
 
 router.param("tripId", async (req, res, next, tripId) => {
   try {
@@ -14,6 +14,13 @@ router.param("tripId", async (req, res, next, tripId) => {
     return next(error);
   }
 });
+
+router.post(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  uploader.single("image"),
+  addTrip
+);
 
 router.delete(
   "/delete/:tripId",
