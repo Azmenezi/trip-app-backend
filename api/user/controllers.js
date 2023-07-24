@@ -13,12 +13,21 @@ exports.fetchUser = async (userId, next) => {
   }
 };
 
-exports.getUser = async (req, res, next) => {
+exports.getUsers = async (req, res, next) => {
   try {
-    const users = await User.find()
+    const users = await User.find().select("-__v -password -trips");
+    return res.status(200).json(users);
+  } catch (error) {
+    return next({ status: 400, message: error.message });
+  }
+};
+exports.getProfile = async (req, res, next) => {
+  try {
+    const profile = await req.foundUser
+      .findOne()
       .select("-__v -password")
       .populate("trips", "title description image _id");
-    return res.status(200).json(users);
+    return res.status(200).json(profile);
   } catch (error) {
     return next({ status: 400, message: error.message });
   }
@@ -31,7 +40,7 @@ exports.createUser = async (req, res, next) => {
     const newUser = await User.create(req.body);
     const token = generateToken(newUser);
     res.status(201).json({ token });
-  } catch (err) {
+  } catch (error) {
     return next({ status: 400, message: error.message });
   }
 };
@@ -40,7 +49,7 @@ exports.signin = async (req, res) => {
   try {
     const token = generateToken(req.user);
     return res.status(200).json({ token });
-  } catch (err) {
+  } catch (error) {
     return next({ status: 400, message: error.message });
   }
 };

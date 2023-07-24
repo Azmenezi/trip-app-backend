@@ -1,11 +1,11 @@
 const express = require("express");
 const {
-  getUser,
   createUser,
   updateUser,
   deleteUser,
   fetchUser,
   signin,
+  getUsers,
 } = require("./controllers");
 const router = express.Router();
 const passport = require("passport");
@@ -23,7 +23,7 @@ router.param("userId", async (req, res, next, userId) => {
   }
 });
 
-router.get("/", passport.authenticate("jwt", { session: false }), getUser);
+router.get("/", passport.authenticate("jwt", { session: false }), getUsers);
 router.post("/create-user", createUser);
 router.post(
   "/sign-in",
