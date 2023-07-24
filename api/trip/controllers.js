@@ -1,9 +1,9 @@
-const User = require("../../models/Trip");
+const Trip = require("../../models/Trip");
 
-exports.fetchUser = async (userId, next) => {
+exports.fetchTrip = async (tripId, next) => {
   try {
-    const user1 = await User.findById(userId);
-    return user1;
+    const trip = await Trip.findById(tripId);
+    return trip;
   } catch (error) {
     return next({ status: 400, message: error.message });
   }
