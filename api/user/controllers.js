@@ -92,3 +92,13 @@ exports.deleteUser = async (req, res, next) => {
     return next({ status: 400, message: error.message });
   }
 };
+
+// exports.showUserProfile = async (req, res, next) => {
+//   const {userId}= req.params;
+//   try {
+//     const tripsByOwner= Trips.
+
+//   } catch (error) {
+//     return next({ status: 400, message: error.message });
+//   }
+// };

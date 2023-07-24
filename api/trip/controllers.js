@@ -1,4 +1,5 @@
 const User = require("../../models/Trip");
+const Trip = require("../../models/Trip");
 
 exports.fetchUser = async (userId, next) => {
   try {
@@ -20,6 +21,15 @@ exports.deleteTrip = async (req, res, next) => {
 
     await req.trip.deleteOne();
     return res.status(204).end();
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.getAllTrips = async (req, res, next) => {
+  try {
+    const trips = await Trip.find();
+    return res.status(200).json(trips);
   } catch (error) {
     return next(error);
   }
