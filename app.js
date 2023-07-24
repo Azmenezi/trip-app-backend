@@ -6,6 +6,7 @@ const app = express();
 const notFound = require("./middlewares/notFoundHandler");
 const errorHandler = require("./middlewares/errorHandler");
 const userRoutes = require("./api/user/routes");
+const tripsRoutes = require("./api/trip/routes");
 const config = require("./config/keys");
 const passport = require("passport");
 const { localStrategy, jwtStrategy } = require("./middlewares/passport");
@@ -23,6 +24,7 @@ passport.use(jwtStrategy);
 // Everything with the word user is a placeholder that you'll change in accordance with your project
 app.use("/media", express.static(path.join(__dirname, "media")));
 app.use("/auth", userRoutes);
+app.use("/trips", tripsRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
