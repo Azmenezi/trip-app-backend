@@ -9,7 +9,7 @@ const {
 } = require("./controllers");
 const router = express.Router();
 const passport = require("passport");
-
+const upload = require("../../middlewares/multer");
 // Everything with the word user is a placeholder that you'll change in accordance with your project
 
 router.param("userId", async (req, res, next, userId) => {
@@ -24,7 +24,7 @@ router.param("userId", async (req, res, next, userId) => {
 });
 
 router.get("/", passport.authenticate("jwt", { session: false }), getUsers);
-router.post("/create-user", createUser);
+router.post("/register", upload.single("image"), createUser);
 router.post(
   "/sign-in",
   passport.authenticate("local", { session: false }),
