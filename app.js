@@ -20,7 +20,7 @@ passport.use("local", localStrategy);
 passport.use(jwtStrategy);
 
 // Everything with the word user is a placeholder that you'll change in accordance with your project
-app.use("/user", userRoutes);
+app.use("/auth", userRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

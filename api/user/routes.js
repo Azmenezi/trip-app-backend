@@ -6,7 +6,7 @@ const {
   deleteUser,
   fetchUser,
   signin,
-} = require("./user.controllers");
+} = require("./controllers");
 const router = express.Router();
 const passport = require("passport");
 
@@ -24,13 +24,21 @@ router.param("userId", async (req, res, next, userId) => {
 });
 
 router.get("/", passport.authenticate("jwt", { session: false }), getUser);
-router.post("/createUser", createUser);
+router.post("/create-user", createUser);
 router.post(
-  "/signin",
+  "/sign-in",
   passport.authenticate("local", { session: false }),
   signin
 );
-router.put("/:userId", updateUser);
-router.delete("/:userId", deleteUser);
+router.put(
+  "/:userId",
+  passport.authenticate("jwt", { session: false }),
+  updateUser
+);
+router.delete(
+  "/:userId",
+  passport.authenticate("jwt", { session: false }),
+  deleteUser
+);
 
 module.exports = router;
