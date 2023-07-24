@@ -9,6 +9,7 @@ const userRoutes = require("./api/user/routes");
 const config = require("./config/keys");
 const passport = require("passport");
 const { localStrategy, jwtStrategy } = require("./middlewares/passport");
+const path = require("path");
 
 app.use(cors());
 connectDb();
@@ -20,6 +21,7 @@ passport.use("local", localStrategy);
 passport.use(jwtStrategy);
 
 // Everything with the word user is a placeholder that you'll change in accordance with your project
+app.use("/media", express.static(path.join(__dirname, "media")));
 app.use("/auth", userRoutes);
 
 app.use(notFound);
