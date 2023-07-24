@@ -6,6 +6,7 @@ const {
   fetchUser,
   signin,
   getUsers,
+  getProfile,
 } = require("./controllers");
 const router = express.Router();
 const passport = require("passport");
@@ -24,6 +25,7 @@ router.param("userId", async (req, res, next, userId) => {
 });
 
 router.get("/", passport.authenticate("jwt", { session: false }), getUsers);
+router.get("/:userId", passport.authenticate("jwt", { session: false }), getProfile);
 router.post("/register", upload.single("image"), createUser);
 router.post(
   "/sign-in",
