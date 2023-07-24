@@ -1,4 +1,13 @@
-const express = require("express");
+const User = require("../../models/Trip");
+
+exports.fetchUser = async (userId, next) => {
+  try {
+    const user1 = await User.findById(userId);
+    return user1;
+  } catch (error) {
+    return next({ status: 400, message: error.message });
+  }
+};
 
 exports.deleteTrip = async (req, res, next) => {
   try {
