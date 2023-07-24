@@ -2,11 +2,11 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 
-const { deleteTrip } = require("./controllers");
+const { fetchTrip, deleteTrip } = require("./controllers");
 
 router.param("tripId", async (req, res, next, tripId) => {
   try {
-    const trip = await fetchUser(tripId);
+    const trip = await fetchTrip(tripId);
     if (!trip) return next({ status: 404, message: "trip not found" });
     req.trip = trip;
     next();
