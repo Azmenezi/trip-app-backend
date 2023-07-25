@@ -30,7 +30,15 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   getProfile
 );
-router.post("/register", upload.single("image"), createUser);
+router.post(
+  "/register",
+  upload.single("image"),
+  (req, res, next) => {
+    console.log(req.file);
+    next();
+  },
+  createUser
+);
 router.post(
   "/sign-in",
   passport.authenticate("local", { session: false }),
