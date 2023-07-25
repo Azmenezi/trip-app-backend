@@ -2,7 +2,9 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 
-const { fetchTrip, deleteTrip, addTrip } = require("./controllers");
+
+const { fetchTrip,  addTrip,deleteTrip, getAllTrips } = require("./controllers");
+
 
 router.param("tripId", async (req, res, next, tripId) => {
   try {
@@ -26,5 +28,11 @@ router.delete(
   "/delete/:tripId",
   passport.authenticate("jwt", { session: false }),
   deleteTrip
+);
+
+router.get(
+  "/gettrips",
+  passport.authenticate("jwt", { session: false }),
+  getAllTrips
 );
 module.exports = router;

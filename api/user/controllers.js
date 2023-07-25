@@ -1,6 +1,7 @@
 const User = require("../../models/User");
 const passHash = require("../../utils/auth/passhash");
 const generateToken = require("../../utils/auth/generateToken");
+const Trip = require("../../models/Trip");
 
 // Everything with the word user is a placeholder that you'll change in accordance with your project
 
@@ -89,5 +90,31 @@ exports.deleteUser = async (req, res, next) => {
     return res.status(204).end();
   } catch (error) {
     return next({ status: 400, message: error.message });
+  }
+};
+
+exports.showUserProfile = async (req, res, next) => {
+  const { userId } = req.params;
+  try {
+    const userProfile = await User.findById(userId);
+    if (!userProfile) {
+      return next({ status: 400, message: "User not found!" });
+    }
+    res.json(userProfile);
+  } catch (error) {
+    return next({ status: 400, message: error.message });
+  }
+};
+
+exports.displayTripsByOwner = async (req, res, next) => {
+  const { userId } = req.params;
+  try {
+    const tripByOwner = await Trip.find({ user: userId });
+    if (tripByOwner.length === 0) {
+      return res.json({ message: "No trips found for this user" });
+    }
+    res.json(tripByOwner);
+  } catch (error) {
+    return next({ status: 500, message: error.message });
   }
 };
