@@ -4,6 +4,7 @@ const passport = require("passport");
 
 
 const { fetchTrip,  addTrip,deleteTrip, getAllTrips } = require("./controllers");
+const upload = require("../../middlewares/multer");
 
 
 router.param("tripId", async (req, res, next, tripId) => {
@@ -20,7 +21,7 @@ router.param("tripId", async (req, res, next, tripId) => {
 router.post(
   "/",
   passport.authenticate("jwt", { session: false }),
-  uploader.single("image"),
+  upload.single("image"),
   addTrip
 );
 
