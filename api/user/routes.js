@@ -11,6 +11,12 @@ const {
 const router = express.Router();
 const passport = require("passport");
 const upload = require("../../middlewares/multer");
+const {
+  usernameValidator,
+  passwordValidator,
+  inputValidator,
+  FieldValidation,
+} = require("../../middlewares/userValidation");
 // Everything with the word user is a placeholder that you'll change in accordance with your project
 
 router.param("userId", async (req, res, next, userId) => {
@@ -33,15 +39,14 @@ router.get(
 router.post(
   "/register",
   upload.single("image"),
-  (req, res, next) => {
-    console.log(req.file);
-    next();
-  },
+  inputValidator([...usernameValidator, ...passwordValidator], true),
+  FieldValidation,
   createUser
 );
 router.post(
   "/sign-in",
   passport.authenticate("local", { session: false }),
+
   signin
 );
 router.put(
