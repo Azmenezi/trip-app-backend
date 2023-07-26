@@ -1,7 +1,5 @@
-
 const Trip = require("../../models/Trip");
 const User = require("../../models/User");
-
 
 exports.fetchTrip = async (tripId, next) => {
   try {
@@ -29,21 +27,16 @@ exports.addTrip = async (req, res, next) => {
       return res.status(403).json({ message: "Field can't be empty" });
     }
 
-    const existingTrip = await Trip.findOne({ title });
-    if (existingTrip) {
-      return res.status(400).json({ message: "Trip already exists" });
-    }
-
     const trip = await Trip.create({
-      title: req.body.name,
-      description: req.body.ingredients,
+      title: req.body.title,
+      description: req.body.description,
       image: req.body.image,
       creator: req.user._id,
     });
 
     req.user.trips = [...req.user.trips, trip._id];
 
-    await user.save();
+    // await user.save();
     return res.status(201).json(trip);
   } catch (err) {
     next(err);
