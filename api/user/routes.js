@@ -7,6 +7,7 @@ const {
   signin,
   getUsers,
   getProfile,
+  getMyProfile,
 } = require("./controllers");
 const router = express.Router();
 const passport = require("passport");
@@ -35,6 +36,11 @@ router.get(
   "/:userId",
   passport.authenticate("jwt", { session: false }),
   getProfile
+);
+router.post(
+  "/my-profile",
+  passport.authenticate("jwt", { session: false }),
+  getMyProfile
 );
 router.post(
   "/register",
