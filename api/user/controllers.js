@@ -118,3 +118,4 @@ exports.displayTripsByOwner = async (req, res, next) => {
     return next({ status: 500, message: error.message });
   }
 };
+

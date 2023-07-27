@@ -67,3 +67,77 @@ exports.getAllTrips = async (req, res, next) => {
     return next(error);
   }
 };
+exports.getTripById = async (req, res, next) => {
+  try {
+    const trip = await Trip.findById(req.trip._id).populate(
+      "creator",
+      "username image trips trips likedTrips savedTrips _id"
+    );
+    return res.status(200).json(trip);
+  } catch (error) {
+    return next(error);
+  }
+};
+exports.likeTrip = async (req, res) => {
+  // Check if the user has already liked the trip
+  const hasUserAlreadyLiked = req.user.likedTrips.some((likedTripId) =>
+    likedTripId.equals(req.trip._id)
+  );
+
+  if (hasUserAlreadyLiked) {
+    // If the user has already liked the trip, unlike it
+    await User.findByIdAndUpdate(
+      req.user._id,
+      { $pull: { likedTrips: req.trip._id } },
+      { new: true }
+    );
+    await Trip.findByIdAndUpdate(
+      req.trip._id,
+      { $pull: { likes: req.user._id } },
+      { new: true }
+    );
+
+    res.status(200).json({ message: "Trip unliked successfully." });
+  } else {
+    // If the user hasn't liked the trip, like it
+    await User.findByIdAndUpdate(
+      req.user._id,
+      { $push: { likedTrips: req.trip._id } },
+      { new: true }
+    );
+    await Trip.findByIdAndUpdate(
+      req.trip._id,
+      { $push: { likes: req.user._id } },
+      { new: true }
+    );
+
+    res.status(200).json({ message: "Trip liked successfully." });
+  }
+};
+
+exports.saveTrip = async (req, res) => {
+  // Check if the user has already saved the trip
+  const hasUserAlreadySaved = req.user.savedTrips.some((savedTripId) =>
+    savedTripId.equals(req.trip._id)
+  );
+
+  if (hasUserAlreadySaved) {
+    // If the user has already saved the trip, unsave it
+    await User.findByIdAndUpdate(
+      req.user._id,
+      { $pull: { savedTrips: req.trip._id } },
+      { new: true }
+    );
+
+    res.status(200).json({ message: "Trip unsaved successfully." });
+  } else {
+    // If the user hasn't saved the trip, save it
+    await User.findByIdAndUpdate(
+      req.user._id,
+      { $push: { savedTrips: req.trip._id } },
+      { new: true }
+    );
+
+    res.status(200).json({ message: "Trip saved successfully." });
+  }
+};
