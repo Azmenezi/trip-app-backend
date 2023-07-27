@@ -8,6 +8,7 @@ const {
   getUsers,
   getProfile,
   getMyProfile,
+  checkUsername,
 } = require("./controllers");
 const router = express.Router();
 const passport = require("passport");
@@ -30,7 +31,7 @@ router.param("userId", async (req, res, next, userId) => {
     return next(error);
   }
 });
-
+router.put("/username", checkUsername);
 router.get("/", passport.authenticate("jwt", { session: false }), getUsers);
 router.get(
   "/:userId",
