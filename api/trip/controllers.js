@@ -34,7 +34,8 @@ exports.addTrip = async (req, res, next) => {
       creator: req.user._id,
     });
 
-    req.user.trips = [...req.user.trips, trip._id];
+    // req.user.trips = [...req.user.trips, trip._id];
+    await req.user.updateOne({ $push: { trips: trip._id } });
 
     // await user.save();
     return res.status(201).json(trip);

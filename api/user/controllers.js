@@ -33,6 +33,16 @@ exports.getProfile = async (req, res, next) => {
   }
 };
 
+exports.getMyProfile = async (req, res, next) => {
+  try {
+    const profile = await User.findById(req.user._id)
+      .select("-__v -password")
+      .populate("trips", "title description image _id");
+    return res.status(200).json(profile);
+  } catch (error) {
+    return next({ status: 400, message: error.message });
+  }
+};
 exports.createUser = async (req, res, next) => {
   try {
     if (req.file) {
@@ -118,4 +128,3 @@ exports.displayTripsByOwner = async (req, res, next) => {
     return next({ status: 500, message: error.message });
   }
 };
-
