@@ -2,10 +2,16 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 
-
-const { fetchTrip,  addTrip,deleteTrip, getAllTrips } = require("./controllers");
+const {
+  fetchTrip,
+  addTrip,
+  deleteTrip,
+  getAllTrips,
+  likeTrip,
+  saveTrip,
+  getTripById,
+} = require("./controllers");
 const upload = require("../../middlewares/multer");
-
 
 router.param("tripId", async (req, res, next, tripId) => {
   try {
@@ -35,5 +41,22 @@ router.get(
   "/gettrips",
   passport.authenticate("jwt", { session: false }),
   getAllTrips
+);
+router.get(
+  "/:tripId",
+  passport.authenticate("jwt", { session: false }),
+  getTripById
+);
+
+router.put(
+  "/like/:tripId",
+  passport.authenticate("jwt", { session: false }),
+  likeTrip
+);
+
+router.put(
+  "/save/:tripId",
+  passport.authenticate("jwt", { session: false }),
+  saveTrip
 );
 module.exports = router;
