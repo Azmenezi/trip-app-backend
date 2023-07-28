@@ -155,8 +155,9 @@ exports.checkUsername = async (req, res, next) => {
     if (user) {
       let suggestions = [];
       let attempts = 0;
-      while (suggestions.length < 5 && attempts < 50) {  // Add an attempt counter
-        attempts++;  // Increment attempts counter
+      while (suggestions.length < 5 && attempts < 50) {
+        // Add an attempt counter
+        attempts++; // Increment attempts counter
         let newUsername = "";
         const randomAdj = getRandomWord(5); // Get a random word of length 5
         const randomNumber = Math.floor(Math.random() * 100);
@@ -192,6 +193,86 @@ exports.checkUsername = async (req, res, next) => {
         .json({ message: "Username is taken", suggestions });
     }
     return res.status(200).json({ message: "Username is available" });
+  } catch (error) {
+    return next({ status: 400, message: error.message });
+  }
+};
+
+exports.followHandler = async (req, res) => {
+  // Check if the user is already following the other user
+  const isUserAlreadyFollowing = req.user.followings.some((followingId) =>
+    followingId.equals(req.foundUser._id)
+  );
+
+  if (isUserAlreadyFollowing) {
+    // If the user is already following, then unfollow
+    await User.findByIdAndUpdate(
+      req.user._id,
+      { $pull: { followings: req.foundUser._id } },
+      { new: true }
+    );
+    await User.findByIdAndUpdate(
+      req.foundUser._id,
+      { $pull: { followers: req.user._id } },
+      { new: true }
+    );
+
+    res.status(200).json({ message: "User unfollowed successfully." });
+  } else {
+    // If the user is not following, then follow
+    await User.findByIdAndUpdate(
+      req.user._id,
+      { $push: { followings: req.foundUser._id } },
+      { new: true }
+    );
+    await User.findByIdAndUpdate(
+      req.foundUser._id,
+      { $push: { followers: req.user._id } },
+      { new: true }
+    );
+
+    res.status(200).json({ message: "User followed successfully." });
+  }
+};
+
+exports.getFollowers = async (req, res, next) => {
+  try {
+    const followers = await User.findById(req.user._id)
+      .select("followers")
+      .populate("followers", "username image _id");
+    return res.status(200).json(followers);
+  } catch (error) {
+    return next({ status: 400, message: error.message });
+  }
+};
+exports.getFollowings = async (req, res, next) => {
+  try {
+    const followings = await User.findById(req.user._id)
+      .select("followings")
+      .populate("followings", "username image _id");
+    return res.status(200).json(followings);
+  } catch (error) {
+    return next({ status: 400, message: error.message });
+  }
+};
+
+exports.getOtherFollowers = async (req, res, next) => {
+  try {
+    const followers = await User.findById(req.foundUser._id)
+      .select("followers")
+      .populate("followers", "username image _id");
+    return res.status(200).json(followers);
+  } catch (error) {
+    return next({ status: 400, message: error.message });
+  }
+};
+
+exports.getOtherFollowings = async (req, res, next) => {
+  try {
+    const followings = await User.findById(req.foundUser._id)
+      .select("followings")
+      .populate("followings", "username image _id");
+    return res.status(200).json(followings);
   } catch (error) {
     return next({ status: 400, message: error.message });
   }
