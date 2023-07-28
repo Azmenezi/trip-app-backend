@@ -247,10 +247,32 @@ exports.getFollowers = async (req, res, next) => {
 };
 exports.getFollowings = async (req, res, next) => {
   try {
-    const followers = await User.findById(req.user._id)
+    const followings = await User.findById(req.user._id)
       .select("followings")
       .populate("followings", "username image _id");
+    return res.status(200).json(followings);
+  } catch (error) {
+    return next({ status: 400, message: error.message });
+  }
+};
+
+exports.getOtherFollowers = async (req, res, next) => {
+  try {
+    const followers = await User.findById(req.foundUser._id)
+      .select("followers")
+      .populate("followers", "username image _id");
     return res.status(200).json(followers);
+  } catch (error) {
+    return next({ status: 400, message: error.message });
+  }
+};
+
+exports.getOtherFollowings = async (req, res, next) => {
+  try {
+    const followings = await User.findById(req.foundUser._id)
+      .select("followings")
+      .populate("followings", "username image _id");
+    return res.status(200).json(followings);
   } catch (error) {
     return next({ status: 400, message: error.message });
   }

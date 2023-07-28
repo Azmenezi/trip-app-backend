@@ -12,6 +12,8 @@ const {
   followHandler,
   getFollowers,
   getFollowings,
+  getOtherFollowings,
+  getOtherFollowers,
 } = require("./controllers");
 const router = express.Router();
 const passport = require("passport");
@@ -50,6 +52,16 @@ router.get(
   "/my-followings",
   passport.authenticate("jwt", { session: false }),
   getFollowings
+);
+router.get(
+  "/followings/:userId",
+  passport.authenticate("jwt", { session: false }),
+  getOtherFollowings
+);
+router.get(
+  "/followers/:userId",
+  passport.authenticate("jwt", { session: false }),
+  getOtherFollowers
 );
 router.get(
   "/my-profile",
