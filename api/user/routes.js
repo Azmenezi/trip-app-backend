@@ -9,6 +9,9 @@ const {
   getProfile,
   getMyProfile,
   checkUsername,
+  followHandler,
+  getFollowers,
+  getFollowings,
 } = require("./controllers");
 const router = express.Router();
 const passport = require("passport");
@@ -34,11 +37,21 @@ router.param("userId", async (req, res, next, userId) => {
 router.put("/username", checkUsername);
 router.get("/", passport.authenticate("jwt", { session: false }), getUsers);
 router.get(
-  "/:userId",
+  "/profile/:userId",
   passport.authenticate("jwt", { session: false }),
   getProfile
 );
-router.post(
+router.get(
+  "/my-followers",
+  passport.authenticate("jwt", { session: false }),
+  getFollowers
+);
+router.get(
+  "/my-followings",
+  passport.authenticate("jwt", { session: false }),
+  getFollowings
+);
+router.get(
   "/my-profile",
   passport.authenticate("jwt", { session: false }),
   getMyProfile
@@ -65,6 +78,11 @@ router.delete(
   "/:userId",
   passport.authenticate("jwt", { session: false }),
   deleteUser
+);
+router.put(
+  "/follow/:userId",
+  passport.authenticate("jwt", { session: false }),
+  followHandler
 );
 
 module.exports = router;
