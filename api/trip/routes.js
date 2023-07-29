@@ -10,6 +10,8 @@ const {
   likeTrip,
   saveTrip,
   getTripById,
+  getLikedTrips,
+  getSavedTrips,
 } = require("./controllers");
 const upload = require("../../middlewares/multer");
 
@@ -42,6 +44,17 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   getAllTrips
 );
+router.get(
+  "/liked-trips",
+  passport.authenticate("jwt", { session: false }),
+  getLikedTrips
+);
+router.get(
+  "/saved-trips",
+  passport.authenticate("jwt", { session: false }),
+  getSavedTrips
+);
+
 router.get(
   "/:tripId",
   passport.authenticate("jwt", { session: false }),
