@@ -38,6 +38,7 @@ exports.getMyProfile = async (req, res, next) => {
     const profile = await User.findById(req.user._id)
       .select("-__v -password")
       .populate("trips", "title description image _id");
+
     return res.status(200).json(profile);
   } catch (error) {
     return next({ status: 400, message: error.message });
@@ -70,19 +71,42 @@ exports.signin = async (req, res) => {
   }
 };
 
+// exports.updateUser = async (req, res, next) => {
+//   try {
+//     if (!req.user._id.equals(req.foundUser._id))
+//       return next({
+//         status: 400,
+//         message: "you dont have the permission to preform this task!",
+//       });
+
+//     if (req.file) {
+//       req.body.image = `${req.file.path.replace("\\", "/")}`;
+//     }
+
+//     await User.findByIdAndUpdate(req.user.id, req.body);
+//     return res.status(204).end();
+//   } catch (error) {
+//     return next({ status: 400, message: error.message });
+//   }
+// };
+
 exports.updateUser = async (req, res, next) => {
   try {
-    if (!req.user._id.equals(req.foundUser._id))
+    if (!req.user._id.equals(req.foundUser._id)) {
       return next({
         status: 400,
-        message: "you dont have the permission to preform this task!",
+        message: "You don't have permission to perform this task!",
       });
-
-    if (req.file) {
-      req.body.image = `${req.file.path.replace("\\", "/")}`;
     }
 
-    await User.findByIdAndUpdate(req.user.id, req.body);
+    if (req.file) {
+      // req.body.headerImage = req.file.path.replace("\\", "/");
+      req.body.image = req.file.path.replace("\\", "/");
+    }
+
+    // Use the 'findByIdAndUpdate' function to update the 'headerImage'
+    await User.findByIdAndUpdate(req.user._id, { $set: req.body });
+
     return res.status(204).end();
   } catch (error) {
     return next({ status: 400, message: error.message });
