@@ -26,7 +26,9 @@ exports.getProfile = async (req, res, next) => {
   try {
     const profile = await User.findById(req.foundUser._id)
       .select("-__v -password")
-      .populate("trips", "title description image _id");
+      .populate("trips", "title description image _id")
+      .populate("followers", "username _id image")
+      .populate("followings", "username _id image");
     return res.status(200).json(profile);
   } catch (error) {
     return next({ status: 400, message: error.message });
@@ -37,7 +39,9 @@ exports.getMyProfile = async (req, res, next) => {
   try {
     const profile = await User.findById(req.user._id)
       .select("-__v -password")
-      .populate("trips", "title description image _id");
+      .populate("trips", "title description image _id")
+      .populate("followers", "username _id image")
+      .populate("followings", "username _id image");
     return res.status(200).json(profile);
   } catch (error) {
     return next({ status: 400, message: error.message });
@@ -155,8 +159,9 @@ exports.checkUsername = async (req, res, next) => {
     if (user) {
       let suggestions = [];
       let attempts = 0;
-      while (suggestions.length < 5 && attempts < 50) {  // Add an attempt counter
-        attempts++;  // Increment attempts counter
+      while (suggestions.length < 5 && attempts < 50) {
+        // Add an attempt counter
+        attempts++; // Increment attempts counter
         let newUsername = "";
         const randomAdj = getRandomWord(5); // Get a random word of length 5
         const randomNumber = Math.floor(Math.random() * 100);
@@ -194,5 +199,23 @@ exports.checkUsername = async (req, res, next) => {
     return res.status(200).json({ message: "Username is available" });
   } catch (error) {
     return next({ status: 400, message: error.message });
+  }
+};
+exports.follow = async (req, res, next) => {
+  try {
+    await req.foundUser.updateOne({ $push: { followers: req.user._id } });
+    await req.user.updateOne({ $push: { followings: req.foundUser._id } });
+    return res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+};
+exports.unfollow = async (req, res, next) => {
+  try {
+    await req.foundUser.updateOne({ $pull: { followers: req.user._id } });
+    await req.user.updateOne({ $pull: { followings: req.foundUser._id } });
+    return res.status(204).end();
+  } catch (error) {
+    next(error);
   }
 };

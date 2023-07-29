@@ -9,6 +9,8 @@ const {
   getProfile,
   getMyProfile,
   checkUsername,
+  follow,
+  unfollow,
 } = require("./controllers");
 const router = express.Router();
 const passport = require("passport");
@@ -23,7 +25,7 @@ const {
 
 router.param("userId", async (req, res, next, userId) => {
   try {
-    const foundUser = await fetchUser(userId);
+    const foundUser = await fetchUser(userId, next);
     if (!foundUser) return next({ status: 404, message: "User not found" });
     req.foundUser = foundUser;
     next();
@@ -65,6 +67,16 @@ router.delete(
   "/:userId",
   passport.authenticate("jwt", { session: false }),
   deleteUser
+);
+router.put(
+  "/follow/:userId",
+  passport.authenticate("jwt", { session: false }),
+  follow
+);
+router.put(
+  "/unfollow/:userId",
+  passport.authenticate("jwt", { session: false }),
+  unfollow
 );
 
 module.exports = router;
