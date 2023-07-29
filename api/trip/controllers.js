@@ -46,14 +46,16 @@ exports.addTrip = async (req, res, next) => {
 
 exports.deleteTrip = async (req, res, next) => {
   try {
-    console.log(req.user._id, req.trip.creator);
-    if (!req.user._id.equals(req.tripe.creator))
+    if (!req.user._id.equals(req.trip.creator))
       return next({
         status: 401,
         message: "You can not delete other persons trip",
       });
 
     await req.trip.deleteOne();
+    await User.findByIdAndUpdate(req.user._id, {
+      pull: { trips: req.trip._id },
+    });
     return res.status(204).end();
   } catch (error) {
     return next(error);
@@ -140,5 +142,26 @@ exports.saveTrip = async (req, res) => {
     );
 
     res.status(200).json({ message: "Trip saved successfully." });
+  }
+};
+
+exports.getLikedTrips = async (req, res, next) => {
+  try {
+    const trips = await User.findById(req.user._id)
+      .select("likedTrips")
+      .populate("likedTrips", "image createdAt _id");
+    return res.status(200).json(trips);
+  } catch (error) {
+    return next({ status: 400, message: error.message });
+  }
+};
+exports.getSavedTrips = async (req, res, next) => {
+  try {
+    const trips = await User.findById(req.user._id)
+      .select("savedTrips")
+      .populate("savedTrips", "image createdAt _id");
+    return res.status(200).json(trips);
+  } catch (error) {
+    return next({ status: 400, message: error.message });
   }
 };
