@@ -83,7 +83,8 @@ router.post(
 );
 router.put(
   "/:userId",
-  passport.authenticate("jwt", upload.single("image"), { session: false }),
+  upload.single("image"),
+  passport.authenticate("jwt", { session: false }),
   updateUser
 );
 router.delete(

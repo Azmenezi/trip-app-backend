@@ -7,6 +7,7 @@ const UserSchema = new Schema(
     password: { type: String, required: true },
     image: { type: String, required: true },
     trips: [{ type: Schema.Types.ObjectId, ref: "Trip" }],
+    headerImage: { type: String },
     likedTrips: [{ type: Schema.Types.ObjectId, ref: "Trip" }],
     savedTrips: [{ type: Schema.Types.ObjectId, ref: "Trip" }],
     followings: [{ type: Schema.Types.ObjectId, ref: "User" }],
