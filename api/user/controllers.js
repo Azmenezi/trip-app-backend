@@ -26,7 +26,7 @@ exports.getProfile = async (req, res, next) => {
   try {
     const profile = await User.findById(req.foundUser._id)
       .select("-__v -password")
-      .populate("trips", "title description image _id");
+      .populate("trips", "title description image createdAt _id");
     return res.status(200).json(profile);
   } catch (error) {
     return next({ status: 400, message: error.message });
@@ -37,7 +37,7 @@ exports.getMyProfile = async (req, res, next) => {
   try {
     const profile = await User.findById(req.user._id)
       .select("-__v -password")
-      .populate("trips", "title description image _id");
+      .populate("trips", "title description image createdAt _id");
 
     return res.status(200).json(profile);
   } catch (error) {
@@ -70,7 +70,6 @@ exports.signin = async (req, res) => {
     return next({ status: 400, message: error.message });
   }
 };
-
 
 exports.updateUser = async (req, res, next) => {
   try {
@@ -283,4 +282,3 @@ exports.getOtherFollowings = async (req, res, next) => {
     return next({ status: 400, message: error.message });
   }
 };
-
