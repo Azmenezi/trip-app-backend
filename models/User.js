@@ -12,6 +12,9 @@ const UserSchema = new Schema(
     savedTrips: [{ type: Schema.Types.ObjectId, ref: "Trip" }],
     followings: [{ type: Schema.Types.ObjectId, ref: "User" }],
     followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    interestedInTrips: [{ type: Schema.Types.ObjectId, ref: "Trip" }],
+    interestedInProfiles: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    interestedInHashtags: [{ type: Schema.Types.ObjectId, ref: "Hashtag" }],
     // create relations in here and in the other model
   },
   { timestamps: true }

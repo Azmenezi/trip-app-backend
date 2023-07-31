@@ -1,6 +1,6 @@
 const Trip = require("../../models/Trip");
+const Hashtag = require("../../models/Hashtag");
 const User = require("../../models/User");
-
 exports.fetchTrip = async (tripId, next) => {
   try {
     const trip = await Trip.findById(tripId);
@@ -13,7 +13,7 @@ exports.fetchTrip = async (tripId, next) => {
 exports.addTrip = async (req, res, next) => {
   try {
     if (!req.user) {
-      res.status(401).json({
+      return res.status(401).json({
         message: "Only members are authorized to add a trip",
       });
     }
@@ -22,8 +22,8 @@ exports.addTrip = async (req, res, next) => {
       req.body.image = `${req.file.path.replace("\\", "/")}`;
     }
 
-    const { title } = req.body;
-    if (title == "") {
+    const { title, hashtags } = req.body;
+    if (title === "") {
       return res.status(403).json({ message: "Field can't be empty" });
     }
 
@@ -34,10 +34,31 @@ exports.addTrip = async (req, res, next) => {
       creator: req.user._id,
     });
 
-    // req.user.trips = [...req.user.trips, trip._id];
+
+    const hashtagModels = [];
+    if (hashtags) {
+      const tags = hashtags.split(",");
+      for (let tag of tags) {
+        // Remove the '#' from the beginning of the hashtag
+        if (tag[0] === "#") {
+          tag = tag.slice(1);
+        }
+
+        let hashtag = await Hashtag.findOne({ name: tag });
+        if (!hashtag) {
+          hashtag = await Hashtag.create({ name: tag });
+        }
+        hashtag.trips.push(trip._id);
+        await hashtag.save();
+        hashtagModels.push(hashtag);
+      }
+    }
+
+    trip.hashtags = hashtagModels.map((hashtag) => hashtag._id);
+    await trip.save();
+
     await req.user.updateOne({ $push: { trips: trip._id } });
 
-    // await user.save();
     return res.status(201).json(trip);
   } catch (err) {
     next(err);
@@ -52,10 +73,17 @@ exports.deleteTrip = async (req, res, next) => {
         message: "You can not delete other persons trip",
       });
 
+    // Find the associated hashtags and remove the trip from each one
+    await Hashtag.updateMany(
+      { trips: req.trip._id },
+      { $pull: { trips: req.trip._id } }
+    );
+
     await req.trip.deleteOne();
     await User.findByIdAndUpdate(req.user._id, {
-      pull: { trips: req.trip._id },
+      $pull: { trips: req.trip._id },
     });
+
     return res.status(204).end();
   } catch (error) {
     return next(error);
@@ -76,6 +104,7 @@ exports.getTripById = async (req, res, next) => {
       "creator",
       "username image trips trips likedTrips savedTrips _id"
     );
+    await req.user.updateOne({ $push: { interestedInTrips: trip._id } });
     return res.status(200).json(trip);
   } catch (error) {
     return next(error);

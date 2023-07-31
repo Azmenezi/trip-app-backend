@@ -8,6 +8,7 @@ const TripSchema = new Schema(
     image: { type: String, required: true },
     creator: { type: Schema.Types.ObjectId, ref: "User" },
     likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    hashtags: [{ type: Schema.Types.ObjectId, ref: "Hashtag" }],
     // create relations in here and in the other model
   },
   { timestamps: true }

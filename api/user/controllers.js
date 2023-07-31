@@ -27,6 +27,7 @@ exports.getProfile = async (req, res, next) => {
     const profile = await User.findById(req.foundUser._id)
       .select("-__v -password")
       .populate("trips", "title description image createdAt _id");
+    await req.user.updateOne({ $push: { interestedInProfiles: profile._id } });
     return res.status(200).json(profile);
   } catch (error) {
     return next({ status: 400, message: error.message });
