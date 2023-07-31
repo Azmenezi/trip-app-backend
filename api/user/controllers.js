@@ -22,12 +22,44 @@ exports.getUsers = async (req, res, next) => {
     return next({ status: 400, message: error.message });
   }
 };
+// exports.getProfile = async (req, res, next) => {
+//   try {
+//     const profile = await User.findById(req.foundUser._id)
+//       .select("-__v -password")
+//       .populate("trips", "title description image createdAt _id");
+//     await req.user.updateOne({ $push: { interestedInProfiles: profile._id } });
+//     return res.status(200).json(profile);
+//   } catch (error) {
+//     return next({ status: 400, message: error.message });
+//   }
+// };
 exports.getProfile = async (req, res, next) => {
   try {
     const profile = await User.findById(req.foundUser._id)
       .select("-__v -password")
       .populate("trips", "title description image createdAt _id");
-    await req.user.updateOne({ $push: { interestedInProfiles: profile._id } });
+
+    let interestedProfiles = req.user.interestedInProfiles;
+
+    // Check if the profile._id is already in the interestedInProfiles array
+    const index = interestedProfiles.indexOf(profile._id);
+    if (index > -1) {
+      // Remove it
+      interestedProfiles.splice(index, 1);
+    }
+
+    // Check if the length has reached 20
+    if (interestedProfiles.length >= 20) {
+      // Remove the oldest one
+      interestedProfiles.shift();
+    }
+
+    // Add the new profile._id to the end of the array
+    interestedProfiles.push(profile._id);
+
+    // Update the user document
+    await req.user.updateOne({ interestedInProfiles: interestedProfiles });
+
     return res.status(200).json(profile);
   } catch (error) {
     return next({ status: 400, message: error.message });
