@@ -12,6 +12,7 @@ const UserSchema = new Schema(
     savedTrips: [{ type: Schema.Types.ObjectId, ref: "Trip" }],
     followings: [{ type: Schema.Types.ObjectId, ref: "User" }],
     followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    alreadySeen: [{ type: Schema.Types.ObjectId, ref: "Trip" }],
     interestedInTrips: [{ type: Schema.Types.ObjectId, ref: "Trip" }],
     interestedInProfiles: [{ type: Schema.Types.ObjectId, ref: "User" }],
     interestedInHashtags: [{ type: Schema.Types.ObjectId, ref: "Hashtag" }],

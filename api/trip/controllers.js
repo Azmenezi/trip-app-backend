@@ -515,9 +515,154 @@ async function calculateInterestScore(userId) {
 //   }
 // };
 
+// exports.getAllTrips = async (req, res, next) => {
+//   try {
+//     const pageSize = 18;
+
+//     // Calculate scores
+//     const userScores = await calculateUserInterestScore(req.user._id);
+//     const followingScores = await calculateFollowingInterestScore(req.user._id);
+//     const interestScores = await calculateInterestScore(req.user._id);
+
+//     // Get top tripIds from each scoring function
+//     const topUserTripIds = userScores
+//       .slice(0, pageSize)
+//       .map((score) => score.tripId);
+//     const topFollowingTripIds = followingScores
+//       .slice(0, pageSize)
+//       .map((score) => score.tripId);
+//     const topInterestTripIds = interestScores
+//       .slice(0, pageSize)
+//       .map((score) => score.tripId);
+//     let trips;
+//     // Combine all top tripIds and remove duplicates
+//     const currentPageTripIds = [
+//       ...new Set([
+//         ...topUserTripIds,
+//         ...topFollowingTripIds,
+//         ...topInterestTripIds,
+//       ]),
+//     ];
+//     trips = await Trip.find({ _id: { $in: currentPageTripIds } });
+
+//     if (trips.length < pageSize) {
+//       const remainingTripsCount = pageSize - trips.length;
+
+//       // Get remainingTripsCount random trips that are not in currentPageTripIds
+//       const randomTrips = await Trip.aggregate([
+//         { $match: { _id: { $nin: trips.map((trip) => trip._id) } } },
+//         { $sample: { size: remainingTripsCount } },
+//       ]);
+//       trips = [...trips,...randomTrips]
+//     }
+//     console.log(trips.length);
+//     // Sort the trips by their scores
+//     trips.sort((a, b) => {
+//       const scoreA =
+//         userScores.find((score) => score.tripId === a._id)?.score ||
+//         0 + followingScores.find((score) => score.tripId === a._id)?.score ||
+//         0 + interestScores.find((score) => score.tripId === a._id)?.score ||
+//         0;
+
+//       const scoreB =
+//         userScores.find((score) => score.tripId === b._id)?.score ||
+//         0 + followingScores.find((score) => score.tripId === b._id)?.score ||
+//         0 + interestScores.find((score) => score.tripId === b._id)?.score ||
+//         0;
+
+//       return scoreB - scoreA;
+//     });
+
+//     return res.status(200).json(trips);
+//   } catch (error) {
+//     return next(error);
+//   }
+// };
+
+// exports.getAllTrips = async (req, res, next) => {
+//   try {
+//     const pageSize = 18;
+//     // Get the page number from the query params, if not defined default is 1
+//     const currentPage = Number(req.query.page) || 1;
+//     const skip = (currentPage - 1) * pageSize;
+
+//     // Calculate scores
+//     const userScores = await calculateUserInterestScore(req.user._id);
+//     const followingScores = await calculateFollowingInterestScore(req.user._id);
+//     const interestScores = await calculateInterestScore(req.user._id);
+
+//     // Get top tripIds from each scoring function
+//     const topUserTripIds = userScores
+//       .slice(skip, skip + pageSize)
+//       .map((score) => score.tripId);
+//     const topFollowingTripIds = followingScores
+//       .slice(skip, skip + pageSize)
+//       .map((score) => score.tripId);
+//     const topInterestTripIds = interestScores
+//       .slice(skip, skip + pageSize)
+//       .map((score) => score.tripId);
+//     let trips;
+
+//     // Combine all top tripIds and remove duplicates
+//     const currentPageTripIds = [
+//       ...new Set([
+//         ...topUserTripIds,
+//         ...topFollowingTripIds,
+//         ...topInterestTripIds,
+//       ]),
+//     ];
+//     trips = await Trip.find({ _id: { $in: currentPageTripIds } });
+
+//     if (trips.length < pageSize) {
+//       const remainingTripsCount = pageSize - trips.length;
+
+//       // Get remainingTripsCount random trips that are not in currentPageTripIds
+//       const randomTrips = await Trip.aggregate([
+//         { $match: { _id: { $nin: trips.map((trip) => trip._id) } } },
+//         { $sample: { size: remainingTripsCount } },
+//       ]);
+//       trips = [...trips,...randomTrips]
+//     }
+//     console.log(trips.length);
+
+//     // Sort the trips by their scores
+//     trips.sort((a, b) => {
+//       const scoreA =
+//         userScores.find((score) => score.tripId === a._id)?.score ||
+//         0 + followingScores.find((score) => score.tripId === a._id)?.score ||
+//         0 + interestScores.find((score) => score.tripId === a._id)?.score ||
+//         0;
+
+//       const scoreB =
+//         userScores.find((score) => score.tripId === b._id)?.score ||
+//         0 + followingScores.find((score) => score.tripId === b._id)?.score ||
+//         0 + interestScores.find((score) => score.tripId === b._id)?.score ||
+//         0;
+
+//       return scoreB - scoreA;
+//     });
+
+//     const totalTripsCount = await Trip.countDocuments({});
+//     const totalPages = Math.ceil(totalTripsCount / pageSize);
+//     const hasMore = currentPage < totalPages;
+
+//     return res.status(200).json({
+//       trips,
+//       currentPage,
+//       totalPages,
+//       hasMore
+//     });
+//   } catch (error) {
+//     return next(error);
+//   }
+// };
+
 exports.getAllTrips = async (req, res, next) => {
   try {
     const pageSize = 18;
+    // Get the page number from the query params, if not defined default is 1
+    const currentPage = Number(req.query.page) || 1;
+    const skip = (currentPage - 1) * pageSize;
 
     // Calculate scores
     const userScores = await calculateUserInterestScore(req.user._id);
@@ -526,15 +671,16 @@ exports.getAllTrips = async (req, res, next) => {
 
     // Get top tripIds from each scoring function
     const topUserTripIds = userScores
-      .slice(0, pageSize)
+      .slice(skip, skip + pageSize)
       .map((score) => score.tripId);
     const topFollowingTripIds = followingScores
-      .slice(0, pageSize)
+      .slice(skip, skip + pageSize)
       .map((score) => score.tripId);
     const topInterestTripIds = interestScores
-      .slice(0, pageSize)
+      .slice(skip, skip + pageSize)
       .map((score) => score.tripId);
     let trips;
+
     // Combine all top tripIds and remove duplicates
     const currentPageTripIds = [
       ...new Set([
@@ -553,9 +699,10 @@ exports.getAllTrips = async (req, res, next) => {
         { $match: { _id: { $nin: trips.map((trip) => trip._id) } } },
         { $sample: { size: remainingTripsCount } },
       ]);
-      trips = [...trips,...randomTrips]
+      trips = [...trips, ...randomTrips];
     }
     console.log(trips.length);
+
     // Sort the trips by their scores
     trips.sort((a, b) => {
       const scoreA =
